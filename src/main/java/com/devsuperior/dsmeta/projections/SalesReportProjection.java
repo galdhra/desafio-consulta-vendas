@@ -9,4 +9,6 @@ public interface SalesReportProjection {
     Double getAmount();
     String getSellerName();
 
+
+
 }

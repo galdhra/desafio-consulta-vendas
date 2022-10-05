@@ -8,6 +8,10 @@ public class SalesSummaryDTO {
        private Double total;
 
 
+       public SalesSummaryDTO(){
+
+       }
+
     public SalesSummaryDTO(String name, Double total) {
         this.name = name;
         this.total = total;
@@ -32,13 +36,5 @@ public class SalesSummaryDTO {
 
     public void setTotal(Double total) {
         this.total = total;
-    }
-
-    @Override
-    public String toString() {
-        return "SalesSummaryDTO{" +
-                "name='" + name + '\'' +
-                ", total=" + total +
-                '}';
     }
 }

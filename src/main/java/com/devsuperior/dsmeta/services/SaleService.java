@@ -3,6 +3,7 @@ package com.devsuperior.dsmeta.services;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 import com.devsuperior.dsmeta.dto.SalesReportDTO;
@@ -24,30 +25,39 @@ public class SaleService {
 	@Autowired
 	private SaleRepository repository;
 
-	private LocalDate date1 = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
 
-	
 	public SaleMinDTO findById(Long id) {
 		Optional<Sale> result = repository.findById(id);
 		Sale entity = result.get();
 		return new SaleMinDTO(entity);
 	}
 
-	public Page<SalesReportDTO> getReport (String minDate, String maxDate, String namePart, Pageable pageable){
-		Page<SalesReportProjection> result = repository.report(initialDate(), finalDate(), namePart, pageable);
-		return result.map(x-> new SalesReportDTO(x));
-	}
-	public Page<SalesSummaryDTO> summary (String minDate, String maxDate, Pageable pageable){
-			Page<SalesSummaryProjection> result = repository.summary(initialDate(), finalDate(), pageable);
+
+	public Page<SalesSummaryDTO> getSummary (String minDate, String maxDate, Pageable pageable){
+			LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+			LocalDate lastYear = today.minusYears(1L);
+
+			LocalDate min = minDate.equals("") ? lastYear : LocalDate.parse(minDate);
+			LocalDate max = maxDate.equals("") ? today : LocalDate.parse(maxDate);
+
+			Page<SalesSummaryProjection> result = repository.summary(min, max, pageable);
+
 		return result.map(x-> new SalesSummaryDTO(x));
 	}
 
-	public String initialDate (){
-		return date1.toString();
+	public Page<SalesReportDTO> getReport (String minDate, String maxDate, String namePart, Pageable pageable){
+
+		LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+		LocalDate lastYear = today.minusYears(1L);
+
+		LocalDate min = minDate.equals("") ? lastYear : LocalDate.parse(minDate);
+		LocalDate max = maxDate.equals("") ? today : LocalDate.parse(maxDate);
+
+		Page<SalesReportProjection> result = repository.report(min, max, namePart, pageable);
+
+		return result.map(x-> new SalesReportDTO(x));
 	}
 
-	public String finalDate (){
-		LocalDate date2 = date1.minusYears(1L);
-		return date2.toString();
+
 	}
-}
+

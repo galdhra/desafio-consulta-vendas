@@ -11,24 +11,26 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
+
 
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-    @Query(nativeQuery = true, value= "SELECT tb_seller.name, SUM(tb_sales.amount) "
-            + "FROM tb_seller "
-            + "INNER JOIN tb_sales ON tb_seller.id = tb_sales.seller_id "
-            + "WHERE tb_sales.date BETWEEN :minDate AND :maxDate "
-            + "GROUP BY tb_seller.name"
+    @Query(value = "SELECT obj.seller.name, SUM(obj.amount) "
+            + "FROM Sale obj "
+            + "WHERE obj.date BETWEEN :minDate AND :maxDate "
+            + "GROUP BY obj.seller.name"
     )
-    Page<SalesSummaryProjection> summary(String minDate, String maxDate, Pageable pageable);
+    Page<SalesSummaryProjection> summary(LocalDate minDate, LocalDate maxDate, Pageable pageable);
+
+    @Query("SELECT obj.id, obj.date, obj.amount, obj.seller.name "
+            + "FROM Sale obj "
+            + "WHERE obj.date BETWEEN :minDate AND :maxDate "
+            + "AND UPPER(obj.seller.name) LIKE UPPER(CONCAT('%', :namePart, '%'))"
+    )
+    Page<SalesReportProjection> report(LocalDate minDate, LocalDate maxDate, String namePart, Pageable pageable);
 
 
-    @Query(nativeQuery = true, value = "SELECT tb_sales.id, tb_sales.date , tb_sales.amount, tb_seller.name " +
-            "FROM tb_seller " +
-            "INNER JOIN tb_sales ON tb_seller.id = tb_sales.seller_id " +
-            "WHERE tb_sales.date BETWEEN :minDate AND :maxDate " +
-            "AND UPPER(tb_seller.name) LIKE UPPER(CONCAT('%', :namePart, '%'))"
-    )
-    Page<SalesReportProjection> report(String minDate, String maxDate, String namePart, Pageable pageable);
+
 
 }

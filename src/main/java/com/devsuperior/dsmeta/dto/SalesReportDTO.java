@@ -58,13 +58,5 @@ public class SalesReportDTO {
         this.sellerName = sellerName;
     }
 
-    @Override
-    public String toString() {
-        return "SalesReportDTO{" +
-                "id=" + id +
-                ", date=" + date +
-                ", amount=" + amount +
-                ", sellerName='" + sellerName + '\'' +
-                '}';
     }
-}
+
