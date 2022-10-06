@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.devsuperior.dsmeta.dto.SalesReportDTO;
 import com.devsuperior.dsmeta.dto.SalesSummaryDTO;
@@ -33,19 +34,19 @@ public class SaleService {
 	}
 
 
-	public Page<SalesSummaryDTO> getSummary (String minDate, String maxDate, Pageable pageable){
+	public List<SalesSummaryDTO> getSummary (String minDate, String maxDate){
 			LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
 			LocalDate lastYear = today.minusYears(1L);
 
-			LocalDate min = minDate.equals("") ? lastYear : LocalDate.parse(minDate);
-			LocalDate max = maxDate.equals("") ? today : LocalDate.parse(maxDate);
+			LocalDate min = "".equals(minDate) ? lastYear : LocalDate.parse(minDate);
+			LocalDate max = "".equals(maxDate) ? today : LocalDate.parse(maxDate);
 
-			Page<SalesSummaryProjection> result = repository.summary(min, max, pageable);
+			List<SalesSummaryProjection> result = repository.summary(min, max);
 
-		return result.map(x-> new SalesSummaryDTO(x));
+		return result.stream().map(x-> new SalesSummaryDTO(x)).collect(Collectors.toList());
 	}
 
-	public Page<SalesReportDTO> getReport (String minDate, String maxDate, String namePart, Pageable pageable){
+	public List<SalesReportDTO> getReport (String minDate, String maxDate, String namePart){
 
 		LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
 		LocalDate lastYear = today.minusYears(1L);
@@ -53,9 +54,9 @@ public class SaleService {
 		LocalDate min = minDate.equals("") ? lastYear : LocalDate.parse(minDate);
 		LocalDate max = maxDate.equals("") ? today : LocalDate.parse(maxDate);
 
-		Page<SalesReportProjection> result = repository.report(min, max, namePart, pageable);
+		List<SalesReportProjection> result = repository.report(min, max, namePart);
 
-		return result.map(x-> new SalesReportDTO(x));
+		return result.stream().map(x-> new SalesReportDTO(x)).collect(Collectors.toList());
 	}
 
 
